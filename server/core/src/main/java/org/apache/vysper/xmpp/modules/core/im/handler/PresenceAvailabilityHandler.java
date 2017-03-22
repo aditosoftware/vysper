@@ -420,9 +420,13 @@ public class PresenceAvailabilityHandler extends AbstractPresenceSpecializedHand
             return null;
         }
 
-        // return current presence as probing result
-        relayStanza(contact, buildPresenceStanza(user, contact, null, latestPresenceStanza.getInnerElements()),
-                sessionContext);
+        // return current presence as probing result (from all stanza.getFrom()-Sessions)
+        for (SessionContext userSession : registry.getSessions(user)) {
+            EntityImpl userentity = new EntityImpl(userSession.getInitiatingEntity(), userSession.getServerRuntimeContext()
+                    .getResourceRegistry().getUniqueResourceForSession(userSession));
+            relayStanza(contact, buildPresenceStanza(userentity, contact, null, latestPresenceStanza.getInnerElements()),
+                    sessionContext);
+        }
 
         return null;
     }
